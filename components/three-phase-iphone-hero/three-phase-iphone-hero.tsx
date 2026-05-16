@@ -34,7 +34,11 @@
 'use client';
 
 import { useEffect, useRef, useState, type ReactNode } from 'react';
-import { IPhoneChassis } from '../iphone-chassis/iphone-chassis';
+// IMPORTANT: use the @/ alias path — when shadcn CLI installs this component,
+// both files land as flat siblings in <project>/components/af/, so a relative
+// '../iphone-chassis/iphone-chassis' path breaks. The @/ alias works in any
+// consumer project that has the standard shadcn alias configured.
+import { IPhoneChassis } from '@/components/af/iphone-chassis';
 
 function cn(...classes: (string | false | null | undefined)[]): string {
   return classes.filter(Boolean).join(' ');
