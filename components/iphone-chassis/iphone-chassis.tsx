@@ -169,8 +169,13 @@ export function IPhoneChassis({
             </div>
           )}
 
-          {/* Screen content slot — renders OVER the wallpaper (z-10) */}
-          <div className={cn('relative z-10 h-full w-full', !immersive && 'pt-12')}>
+          {/* Screen content slot — fills the screen edge-to-edge (z-10).
+              Children fill h-full w-full; their background covers the whole
+              screen including the area under the status bar + notch. The
+              status bar is an OVERLAY on top (z-10 / z-20) — like a real iOS
+              app. Children that want to leave room for the status bar opt-in
+              by adding their own pt-[44px] (or similar). */}
+          <div className="relative z-10 h-full w-full">
             {children}
           </div>
         </div>
@@ -224,10 +229,13 @@ export function IPhoneChassis({
  * formally in AF canon yet (canon is Ink-Paper-Pulse + AFVQ-blue + Liquid-Glass);
  * queued for Damian validation at ~/.claude/skills/af-design-catalog/PENDING-DAMIAN-VALIDATION.md.
  *
- * Composition:
+ * Composition (size-adaptive — works on any chassis from compact iPhone to hero MacBook):
  *   - Base linear-gradient: deep purple → deep navy → deep blue (135deg)
- *   - Two radial glow spots: violet at top-left, AF-pulse at bottom-right
- *   - Subtle 40px grid overlay at low opacity
+ *   - Two radial glow spots positioned by percentage: violet at 22%/18%,
+ *     AF-pulse at 78%/82% — auto-adapt to any aspect ratio
+ *   - Grid overlay sized by percentage (8% × 8%) — always ~12 columns × 12
+ *     rows regardless of chassis size. Looks coherent on compact phones AND
+ *     wide MacBooks AND fluid sizes in between.
  */
 export function AfWallpaper() {
   return (
@@ -241,7 +249,7 @@ export function AfWallpaper() {
         `,
       }}
     >
-      {/* Grid overlay — subtle 40px graph-paper texture */}
+      {/* Grid overlay — size-relative graph-paper texture (8% × 8% = ~12 cells) */}
       <div
         className="absolute inset-0"
         style={{
@@ -249,7 +257,7 @@ export function AfWallpaper() {
             linear-gradient(rgba(255, 255, 255, 0.06) 1px, transparent 1px),
             linear-gradient(90deg, rgba(255, 255, 255, 0.06) 1px, transparent 1px)
           `,
-          backgroundSize: '40px 40px',
+          backgroundSize: '8% 8%',
         }}
       />
     </div>

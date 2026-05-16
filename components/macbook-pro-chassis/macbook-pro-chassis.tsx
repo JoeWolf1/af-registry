@@ -169,8 +169,11 @@ export function MacbookProChassis({
             </div>
           )}
 
-          {/* Screen content slot — over wallpaper at z-10 */}
-          <div className={cn('relative z-10 h-full w-full', !immersive && 'pt-5')}>
+          {/* Screen content slot — fills the screen edge-to-edge (z-10).
+              Children fill h-full w-full; menu bar overlays on top of whatever
+              children render (like a real macOS app). Children that need to
+              avoid the menu bar opt-in by adding pt-[24px] (or similar). */}
+          <div className="relative z-10 h-full w-full">
             {children}
           </div>
         </div>
@@ -229,7 +232,7 @@ function AfWallpaper() {
             linear-gradient(rgba(255, 255, 255, 0.06) 1px, transparent 1px),
             linear-gradient(90deg, rgba(255, 255, 255, 0.06) 1px, transparent 1px)
           `,
-          backgroundSize: '40px 40px',
+          backgroundSize: '8% 8%',
         }}
       />
     </div>
