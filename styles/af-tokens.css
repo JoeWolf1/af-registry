@@ -1,0 +1,59 @@
+/* ============================================================
+ * AF Brand Tokens — canonical color + glow system
+ * Source of truth: ~/.claude/skills/af-design-catalog/palettes/ink-paper-pulse.md
+ * Confidence: [canon-confirmed] for base 4 tokens; [canon-inferred] for derivatives
+ *
+ * Install via shadcn CLI:
+ *   npx shadcn add https://raw.githubusercontent.com/JoeWolf1/af-registry/main/public/r/af-tokens.json
+ *
+ * Then import in your global stylesheet:
+ *   @import "./styles/af-tokens.css";
+ * ============================================================ */
+
+:root {
+  /* Base AF tokens — Damian-canon */
+  --af-ink:        #010E26;
+  --af-ink-muted:  #14233E;
+  --af-pulse:      #60A5FA;
+  --af-paper:      #FFFFFF;
+
+  /* Pulse glow variants — for AFVQ underglows, hover states, focus rings */
+  --af-pulse-glow-06:  rgba(96, 165, 250, 0.06);
+  --af-pulse-glow-12:  rgba(96, 165, 250, 0.12);
+  --af-pulse-glow-18:  rgba(96, 165, 250, 0.18);
+  --af-pulse-glow-20:  rgba(96, 165, 250, 0.20);
+  --af-pulse-glow-28:  rgba(96, 165, 250, 0.28);
+  --af-pulse-glow-30:  rgba(96, 165, 250, 0.30);
+  --af-pulse-glow-50:  rgba(96, 165, 250, 0.50);
+
+  /* Ink glow variants — subtle shadows on light backgrounds */
+  --af-ink-glow-04:    rgba(1, 14, 38, 0.04);
+  --af-ink-glow-08:    rgba(1, 14, 38, 0.08);
+  --af-ink-glow-10:    rgba(1, 14, 38, 0.10);
+  --af-ink-glow-16:    rgba(1, 14, 38, 0.16);
+  --af-ink-glow-30:    rgba(1, 14, 38, 0.30);
+
+  /* Surface variants — Radix-style 12-step layered hierarchy */
+  --af-surface-1:      var(--af-paper);
+  --af-surface-2:      rgba(1, 14, 38, 0.02);
+  --af-surface-3:      rgba(1, 14, 38, 0.04);
+  --af-surface-4:      rgba(1, 14, 38, 0.08);
+
+  /* Border variants */
+  --af-border-subtle:  rgba(1, 14, 38, 0.10);
+  --af-border-strong:  rgba(1, 14, 38, 0.20);
+
+  /* Canonical easings */
+  --af-ease-out-soft:  cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* OKLCH variants (Tailwind v4 default) — use these on new builds.
+ * Verify perceptual match before locking; original canon was authored in sRGB. */
+@supports (color: oklch(0 0 0)) {
+  :root {
+    --af-ink-oklch:        oklch(0.14 0.04 252);
+    --af-ink-muted-oklch:  oklch(0.24 0.05 252);
+    --af-pulse-oklch:      oklch(0.74 0.13 245);
+    --af-paper-oklch:      oklch(1.00 0.00 0);
+  }
+}

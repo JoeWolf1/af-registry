@@ -1,0 +1,20 @@
+{
+  "name": "af-registry",
+  "version": "0.1.0",
+  "description": "AF (Anfragenfluss) shadcn registry — canonical brand-grade components installable via shadcn CLI",
+  "private": false,
+  "license": "UNLICENSED",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/JoeWolf1/af-registry"
+  },
+  "homepage": "https://github.com/JoeWolf1/af-registry",
+  "keywords": [
+    "shadcn",
+    "registry",
+    "anfragenfluss",
+    "af",
+    "brand-canon",
+    "design-system"
+  ]
+}

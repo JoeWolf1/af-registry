@@ -1,0 +1,40 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry.json",
+  "name": "af-registry",
+  "homepage": "https://github.com/JoeWolf1/af-registry",
+  "items": [
+    {
+      "name": "af-tokens",
+      "type": "registry:style",
+      "title": "AF Brand Tokens",
+      "description": "Canonical AF CSS tokens — Ink, Paper, Pulse + semantic glow/surface/border derivatives. Source: ~/.claude/skills/af-design-catalog/palettes/ink-paper-pulse.md",
+      "files": [
+        {
+          "path": "styles/af-tokens.css",
+          "type": "registry:style"
+        }
+      ]
+    },
+    {
+      "name": "afvq-card-unified",
+      "type": "registry:component",
+      "title": "AFVQ Card (Unified)",
+      "description": "AF testimonial card — single unified frame containing left-aligned text + right-aligned video, AFVQ pulse-blue underglow tying both halves into one designed moment. Alternating left/right per row supported via the variant prop. Per af-brand-doctrine § 6.",
+      "files": [
+        {
+          "path": "components/afvq-card-unified/afvq-card-unified.tsx",
+          "type": "registry:component"
+        }
+      ],
+      "dependencies": ["react"],
+      "registryDependencies": ["af-tokens"],
+      "tailwind": {
+        "config": {
+          "theme": {
+            "extend": {}
+          }
+        }
+      }
+    }
+  ]
+}

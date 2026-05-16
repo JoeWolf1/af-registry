@@ -1,0 +1,15 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "af-tokens",
+  "type": "registry:style",
+  "title": "AF Brand Tokens",
+  "description": "Canonical AF CSS tokens — Ink, Paper, Pulse + semantic glow/surface/border derivatives. Source: ~/.claude/skills/af-design-catalog/palettes/ink-paper-pulse.md",
+  "files": [
+    {
+      "path": "styles/af-tokens.css",
+      "content": "/* ============================================================\n * AF Brand Tokens — canonical color + glow system\n * Source of truth: ~/.claude/skills/af-design-catalog/palettes/ink-paper-pulse.md\n * Confidence: [canon-confirmed] for base 4 tokens; [canon-inferred] for derivatives\n *\n * Install via shadcn CLI:\n *   npx shadcn add https://raw.githubusercontent.com/JoeWolf1/af-registry/main/public/r/af-tokens.json\n *\n * Then import in your global stylesheet:\n *   @import \"./styles/af-tokens.css\";\n * ============================================================ */\n\n:root {\n  /* Base AF tokens — Damian-canon */\n  --af-ink:        #010E26;\n  --af-ink-muted:  #14233E;\n  --af-pulse:      #60A5FA;\n  --af-paper:      #FFFFFF;\n\n  /* Pulse glow variants — for AFVQ underglows, hover states, focus rings */\n  --af-pulse-glow-06:  rgba(96, 165, 250, 0.06);\n  --af-pulse-glow-12:  rgba(96, 165, 250, 0.12);\n  --af-pulse-glow-18:  rgba(96, 165, 250, 0.18);\n  --af-pulse-glow-20:  rgba(96, 165, 250, 0.20);\n  --af-pulse-glow-28:  rgba(96, 165, 250, 0.28);\n  --af-pulse-glow-30:  rgba(96, 165, 250, 0.30);\n  --af-pulse-glow-50:  rgba(96, 165, 250, 0.50);\n\n  /* Ink glow variants — subtle shadows on light backgrounds */\n  --af-ink-glow-04:    rgba(1, 14, 38, 0.04);\n  --af-ink-glow-08:    rgba(1, 14, 38, 0.08);\n  --af-ink-glow-10:    rgba(1, 14, 38, 0.10);\n  --af-ink-glow-16:    rgba(1, 14, 38, 0.16);\n  --af-ink-glow-30:    rgba(1, 14, 38, 0.30);\n\n  /* Surface variants — Radix-style 12-step layered hierarchy */\n  --af-surface-1:      var(--af-paper);\n  --af-surface-2:      rgba(1, 14, 38, 0.02);\n  --af-surface-3:      rgba(1, 14, 38, 0.04);\n  --af-surface-4:      rgba(1, 14, 38, 0.08);\n\n  /* Border variants */\n  --af-border-subtle:  rgba(1, 14, 38, 0.10);\n  --af-border-strong:  rgba(1, 14, 38, 0.20);\n\n  /* Canonical easings */\n  --af-ease-out-soft:  cubic-bezier(0.16, 1, 0.3, 1);\n}\n\n/* OKLCH variants (Tailwind v4 default) — use these on new builds.\n * Verify perceptual match before locking; original canon was authored in sRGB. */\n@supports (color: oklch(0 0 0)) {\n  :root {\n    --af-ink-oklch:        oklch(0.14 0.04 252);\n    --af-ink-muted-oklch:  oklch(0.24 0.05 252);\n    --af-pulse-oklch:      oklch(0.74 0.13 245);\n    --af-paper-oklch:      oklch(1.00 0.00 0);\n  }\n}\n",
+      "type": "registry:style",
+      "target": "styles/af-tokens.css"
+    }
+  ]
+}
