@@ -53,11 +53,16 @@ export interface IPhoneChassisProps extends Omit<HTMLAttributes<HTMLDivElement>,
   variant?: 'ink' | 'paper';
   /**
    * Device size class — controls overall scale.
-   * - `compact` — for inline use in grids (~280px wide)
-   * - `default` — standard (~360px wide on md+)
-   * - `hero` — large hero use (~440px wide on md+)
+   * - `compact` — for inline use in grids (~280px wide, fixed)
+   * - `default` — standard (~360px wide on md+, fixed)
+   * - `hero` — large hero use (~440px wide on md+, fixed)
+   * - `fluid` — viewport-aware. Height set to `min(88vh, 920px)`; width
+   *   auto-derives via aspect-ratio. Bigger-than-default visual on tall
+   *   viewports, scales down on shorter ones, NEVER clips. Use for sticky
+   *   pinned contexts (three-phase iPhone hero) where the iPhone must fit
+   *   the visible viewport regardless of screen height.
    */
-  size?: 'compact' | 'default' | 'hero';
+  size?: 'compact' | 'default' | 'hero' | 'fluid';
   /**
    * When true, hides the notch + status bar.
    * Use for content that needs to fill the screen edge-to-edge (e.g. full-bleed video).
@@ -86,10 +91,14 @@ export function IPhoneChassis({
   className,
   ...rest
 }: IPhoneChassisProps) {
+  // Fixed sizes set width; aspect-[9/19.5] derives height.
+  // `fluid` sets height instead; aspect-ratio derives width — never clips
+  // because the iPhone scales DOWN on short viewports.
   const sizeClasses = {
     compact: 'w-[280px]',
     default: 'w-[320px] md:w-[360px]',
     hero: 'w-[360px] md:w-[440px]',
+    fluid: 'h-[min(88vh,920px)]',
   }[size];
 
   const frameColor =
