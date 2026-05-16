@@ -56,6 +56,20 @@
       ],
       "dependencies": ["react"],
       "registryDependencies": ["af-tokens", "iphone-chassis"]
+    },
+    {
+      "name": "liquid-glass-frame",
+      "type": "registry:component",
+      "title": "Liquid-Glass Frame",
+      "description": "AF decorative chassis — multi-layer translucent frosted-glass material wrapping content (iPhone mocks, video frames, hero cards). 4-layer stack: transmission + frosting + edge highlights + AFVQ-blue underglow. Intensities: default, subtle, pulse-tinted. Status [damian-canon-needed] on exact blur/transmission stops — see ~/.claude/skills/af-design-catalog/PENDING-DAMIAN-VALIDATION.md. Applies on Experience-Page + Freigabe-Portal anchors only. Backdrop-filter is GPU-heavy — max ~3 per viewport.",
+      "files": [
+        {
+          "path": "components/liquid-glass-frame/liquid-glass-frame.tsx",
+          "type": "registry:component"
+        }
+      ],
+      "dependencies": ["react"],
+      "registryDependencies": ["af-tokens"]
     }
   ]
 }
