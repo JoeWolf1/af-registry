@@ -1,14 +1,15 @@
-/* ============================================================
- * AF Brand Tokens — canonical color + glow system
- * Source of truth: ~/.claude/skills/af-design-catalog/palettes/ink-paper-pulse.md
- * Confidence: [canon-confirmed] for base 4 tokens; [canon-inferred] for derivatives
+/* AF font canon — Geist (sans) + Geist Mono (mono).
  *
- * Install via shadcn CLI:
- *   npx shadcn add https://raw.githubusercontent.com/JoeWolf1/af-registry/main/public/r/af-tokens.json
+ * IMPORTANT: load Geist via <link rel="stylesheet"> in your document <head>:
  *
- * Then import in your global stylesheet:
- *   @import "./styles/af-tokens.css";
- * ============================================================ */
+ *   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+ *   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500&display=swap">
+ *
+ * Why not `@import url(...)` here? Tailwind v4 / PostCSS pipelines concatenate
+ * af-tokens.css AFTER other CSS rules, which makes the @import illegal
+ * (CSS spec: @import must precede all other statements). The compiled bundle
+ * then drops the import silently and Geist never loads. The <link> approach
+ * is the same byte-cost and works in every pipeline. Joe-flagged 2026-05-17. */
 
 :root {
   /* Base AF tokens — Damian-canon */
@@ -16,6 +17,73 @@
   --af-ink-muted:  #14233E;
   --af-pulse:      #60A5FA;
   --af-paper:      #FFFFFF;
+
+  /* ─── Typography ───────────────────────────────────────────────────────
+   * Font canon: Geist (sans) for everything UI/body, Geist Mono for code,
+   * timestamps, numeric counts, story-IDs. Letter-spacing tightens with
+   * size — AF brand convention (Damian-canon): large display = tighter,
+   * small caption = normal, eyebrow micro-text = looser tracking.
+   * ─────────────────────────────────────────────────────────────────── */
+
+  /* Font families */
+  --af-font-sans:  'Geist', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+  --af-font-mono:  'Geist Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+
+  /* Semantic weights — use these, not raw numbers */
+  --af-weight-regular:   400;  /* body */
+  --af-weight-medium:    500;  /* UI elements, buttons, chips */
+  --af-weight-semibold:  600;  /* headlines, emphasis */
+  --af-weight-bold:      700;  /* hero display, callouts */
+
+  /* Type scale — 9 named usages, each with size/line-height/tracking.
+   * Sizes lean a touch larger than typical web defaults (AF prefers
+   * generous, readable type at the cost of density). Tracking values come
+   * from Geist's own design recommendations + AF brand observations. */
+
+  /* Display — hero / opening headline (use 1-2× per page max) */
+  --af-text-display-size:      56px;
+  --af-text-display-line:      1.05;
+  --af-text-display-tracking:  -0.024em;
+
+  /* H1 — page title */
+  --af-text-h1-size:           44px;
+  --af-text-h1-line:           1.08;
+  --af-text-h1-tracking:       -0.018em;
+
+  /* H2 — section heading */
+  --af-text-h2-size:           28px;
+  --af-text-h2-line:           1.15;
+  --af-text-h2-tracking:       -0.014em;
+
+  /* H3 — sub-section heading */
+  --af-text-h3-size:           20px;
+  --af-text-h3-line:           1.25;
+  --af-text-h3-tracking:       -0.008em;
+
+  /* Body — default running text (paragraphs, lede) */
+  --af-text-body-size:         16px;
+  --af-text-body-line:         1.55;
+  --af-text-body-tracking:     -0.003em;
+
+  /* UI — buttons, chips, labels, form fields */
+  --af-text-ui-size:           14px;
+  --af-text-ui-line:           1.45;
+  --af-text-ui-tracking:       0.005em;
+
+  /* Caption — small meta text, footers, secondary info */
+  --af-text-caption-size:      12px;
+  --af-text-caption-line:      1.45;
+  --af-text-caption-tracking:  0.005em;
+
+  /* Mono — code, story-IDs, timestamps, numeric counts */
+  --af-text-mono-size:         13px;
+  --af-text-mono-line:         1.45;
+  --af-text-mono-tracking:     0;
+
+  /* Eyebrow — small uppercase pulse-blue text above headlines */
+  --af-text-eyebrow-size:      11px;
+  --af-text-eyebrow-line:      1;
+  --af-text-eyebrow-tracking:  0.12em;
 
   /* Pulse glow variants — for AFVQ underglows, hover states, focus rings */
   --af-pulse-glow-06:  rgba(96, 165, 250, 0.06);

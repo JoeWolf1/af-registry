@@ -110,20 +110,32 @@ export function MacbookProChassis({
 
   return (
     <figure className={cn('flex flex-col items-center', className)} {...rest}>
+      {/* Sized wrapper — lid + base share this width so `%` on the base resolves
+          against the LID width, not the surrounding figure / card. Without this
+          wrapper the base would stretch to whatever the figure's parent gives it. */}
+      <div className={cn('relative flex flex-col items-center', sizeClasses)}>
       {/* ---- Lid (screen) ---- */}
       <div
         className={cn(
           // Lid outer frame — 16:10 aspect ratio (canonical MacBook Pro display)
-          'relative aspect-[16/10] rounded-[18px] border-[3px]',
+          'relative aspect-[16/10] w-full rounded-[18px] border-[3px]',
           'shadow-[0_30px_80px_-12px_var(--af-ink-glow-30,rgba(1,14,38,0.30)),0_12px_32px_-4px_var(--af-pulse-glow-12,rgba(96,165,250,0.12))]',
-          sizeClasses,
           frameColor,
         )}
       >
-        {/* Inner screen — bezel + content */}
+        {/* Inner screen — bezel + content.
+            CONCENTRIC CORNER MATH (gets the dark bezel right at corners):
+              outer lid radius = 18px
+              outer's border   = 3px (content-box edge at 3,3 from outer corner)
+              inner inset      = 10px (from content-box edge)
+              ⇒ inner bounding-box corner at (13, 13) from outer corner
+              ⇒ for concentric curves, inner radius = 18 - 13 = 5px.
+            Anything larger leaves white slivers at the corners (the inner div's
+            bg-paper bleeds into where the lid curve has already retreated).
+            Same bug class as iphone-chassis. Joe-flagged 2026-05-17. */}
         <div
           className={cn(
-            'absolute inset-[10px] overflow-hidden rounded-[10px]',
+            'absolute inset-[10px] overflow-hidden rounded-[5px]',
             'bg-[color:var(--af-paper,#FFFFFF)]',
           )}
         >
@@ -176,21 +188,25 @@ export function MacbookProChassis({
 
       {/* ---- Base / hinge strip ----
           Directly attached to the lid bottom — no gap, no floating screen.
-          Width: 105% of lid (extends slightly to suggest keyboard deck plane).
+          Width: 102% of the LID (subtle overhang suggests keyboard deck plane
+          behind the screen — anything more reads as wings). The `%` resolves
+          against the sized wrapper above (which equals lid width), NOT the
+          surrounding figure / card.
           Height: 10px (visible plane without dominating).
           Rounded-b: matches lid corner-radius treatment for visual continuity. */}
       <div
         aria-hidden="true"
         className={cn(
-          'relative -mt-[2px] h-[10px] rounded-b-[14px]',
+          'relative -mt-[2px] h-[14px] w-[102%] rounded-b-[14px]',
           'shadow-[0_6px_12px_-2px_var(--af-ink-glow-16,rgba(1,14,38,0.16))]',
           // Subtle gradient — top edge slightly darker (hinge crease) → lighter base
           'before:absolute before:inset-x-0 before:top-0 before:h-[2px] before:rounded-t-sm',
           variant === 'space-gray' ? 'before:bg-black/30' : 'before:bg-black/15',
           baseColor,
         )}
-        style={{ width: '105%' }}
       />
+      </div>
+      {/* End sized wrapper — close after base so lid+base share width context. */}
 
       {caption && (
         <figcaption className="mt-3 text-center text-sm text-[color:var(--af-ink-muted,#14233E)]">
@@ -219,7 +235,10 @@ function AfWallpaper() {
         `,
       }}
     >
-      {/* Grid overlay — subtle 40px graph-paper texture */}
+      {/* Grid overlay — subtle 40px graph-paper texture.
+          Fixed pixel size (NOT %): on a 16:10 aspect ratio, `8% 8%` makes the
+          width-cells 1.6× the height-cells, so squares become rectangles. Joe
+          flagged this on the iPhone variant 2026-05-17 — same fix applies here. */}
       <div
         className="absolute inset-0"
         style={{
@@ -227,7 +246,7 @@ function AfWallpaper() {
             linear-gradient(rgba(255, 255, 255, 0.06) 1px, transparent 1px),
             linear-gradient(90deg, rgba(255, 255, 255, 0.06) 1px, transparent 1px)
           `,
-          backgroundSize: '8% 8%',
+          backgroundSize: '40px 40px',
         }}
       />
     </div>

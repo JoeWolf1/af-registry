@@ -1,0 +1,17 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "use-reduced-motion",
+  "title": "useReducedMotion",
+  "description": "React hook — subscribes to the OS-level `prefers-reduced-motion: reduce` media query and returns true when the user has asked the system to minimize non-essential animation. Shared dependency of every AF Werkschau animation primitive (SwipeIn, ScrollReveal, NotificationArrive, PressLike). WCAG 2.2 SC 2.3.3 compliance. SSR-safe (returns false on server).",
+  "dependencies": [
+    "react"
+  ],
+  "files": [
+    {
+      "path": "components/use-reduced-motion/use-reduced-motion.ts",
+      "content": "/**\n * useReducedMotion — subscribes to the OS-level `prefers-reduced-motion: reduce`\n * media query and returns true when the user has asked the system to minimize\n * non-essential animation.\n *\n * Shared by every AF Werkschau animation primitive (SwipeIn, ScrollReveal,\n * NotificationArrive, PressLike, TypewriterRotator) so the gate logic stays\n * consistent — one source of truth, one place to test.\n *\n * Returns false during SSR (no `window.matchMedia` on the server). The first\n * client render after hydration flips it to the actual user preference.\n *\n * WCAG 2.2 SC 2.3.3 (Animation from Interactions, AAA): non-essential motion\n * must be suppressible. Joshua Comeau \"Prefers Reduced Motion\" + Val Head\n * \"Designing Safer Animations\" (Smashing, May 2025) are the canonical guides.\n * AF Werkschau lab report 2026-05-16 § A.5.\n */\n\n'use client';\n\nimport { useEffect, useState } from 'react';\n\nexport function useReducedMotion(): boolean {\n  const [reduced, setReduced] = useState(false);\n\n  useEffect(() => {\n    if (typeof window === 'undefined' || typeof window.matchMedia === 'undefined') {\n      return;\n    }\n    const mq = window.matchMedia('(prefers-reduced-motion: reduce)');\n    setReduced(mq.matches);\n\n    // Subscribe to changes — user can toggle the OS setting mid-session\n    // (System Settings → Accessibility → Display → Reduce motion on macOS).\n    const handler = (e: MediaQueryListEvent) => setReduced(e.matches);\n    mq.addEventListener('change', handler);\n    return () => mq.removeEventListener('change', handler);\n  }, []);\n\n  return reduced;\n}\n",
+      "type": "registry:hook"
+    }
+  ],
+  "type": "registry:hook"
+}

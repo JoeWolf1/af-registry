@@ -124,10 +124,20 @@ export function IPhoneChassis({
           frameColor,
         )}
       >
-        {/* Screen — inner bezel + content */}
+        {/* Screen — inner bezel + content.
+            CONCENTRIC CORNER MATH (critical — gets the dark frame right at corners):
+              outer chassis radius = 44px
+              outer's border        = 3px (so content-box edge is at 3,3 from chassis outer corner)
+              inner inset           = 6px (from chassis content-box edge)
+              ⇒ inner div bounding-box corner sits at (9, 9) from chassis outer corner
+              ⇒ for the inner curve to be concentric with the chassis curve
+                (both centered at 44, 44), inner radius = 44 - 9 = 35px.
+            Using anything larger leaves white slivers in the corners (the inner
+            div's bg-paper bleeds into the area where the chassis curve has
+            already retreated inward). Joe-flagged 2026-05-17. */}
         <div
           className={cn(
-            'absolute inset-[6px] overflow-hidden rounded-[38px]',
+            'absolute inset-[6px] overflow-hidden rounded-[35px]',
             'bg-[color:var(--af-paper,#FFFFFF)]',
           )}
         >
