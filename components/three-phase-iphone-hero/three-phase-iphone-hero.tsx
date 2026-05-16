@@ -207,9 +207,16 @@ export function ThreePhaseIphoneHero({
       </div>
 
       {/* ---- RIGHT COLUMN: sticky iPhone ---- */}
+      {/* Sticky wrapper sized to viewport (h-screen) with flex-center so the */}
+      {/* iPhone is vertically centered inside the visible area regardless of */}
+      {/* viewport height. size="compact" (280px wide × ~607px tall + caption */}
+      {/* ≈ 647px total) leaves comfortable breathing room on standard laptop */}
+      {/* displays (~800-900px viewport). Don't bump to "default" or "hero" */}
+      {/* here — they overflow. Use the IPhoneChassis directly outside the */}
+      {/* three-phase context if you need a larger device mock. */}
       <div className="hidden lg:block">
-        <div className="sticky top-[10vh] flex flex-col items-center py-[10vh]">
-          <IPhoneChassis size="default" caption={caption}>
+        <div className="sticky top-0 h-screen flex items-center justify-center">
+          <IPhoneChassis size="compact" caption={caption}>
             <PhaseScreen activePhase={activePhase}>
               {phaseContent[activePhase]}
             </PhaseScreen>
