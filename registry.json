@@ -26,8 +26,12 @@
           "type": "registry:component"
         }
       ],
-      "dependencies": ["react"],
-      "registryDependencies": ["af-tokens"]
+      "dependencies": [
+        "react"
+      ],
+      "registryDependencies": [
+        "af-tokens"
+      ]
     },
     {
       "name": "iphone-chassis",
@@ -40,8 +44,12 @@
           "type": "registry:component"
         }
       ],
-      "dependencies": ["react"],
-      "registryDependencies": ["af-tokens"]
+      "dependencies": [
+        "react"
+      ],
+      "registryDependencies": [
+        "af-tokens"
+      ]
     },
     {
       "name": "three-phase-iphone-hero",
@@ -54,8 +62,13 @@
           "type": "registry:component"
         }
       ],
-      "dependencies": ["react"],
-      "registryDependencies": ["af-tokens", "iphone-chassis"]
+      "dependencies": [
+        "react"
+      ],
+      "registryDependencies": [
+        "af-tokens",
+        "iphone-chassis"
+      ]
     },
     {
       "name": "macbook-pro-chassis",
@@ -68,8 +81,12 @@
           "type": "registry:component"
         }
       ],
-      "dependencies": ["react"],
-      "registryDependencies": ["af-tokens"]
+      "dependencies": [
+        "react"
+      ],
+      "registryDependencies": [
+        "af-tokens"
+      ]
     },
     {
       "name": "liquid-glass-frame",
@@ -82,8 +99,46 @@
           "type": "registry:component"
         }
       ],
-      "dependencies": ["react"],
-      "registryDependencies": ["af-tokens"]
+      "dependencies": [
+        "react"
+      ],
+      "registryDependencies": [
+        "af-tokens"
+      ]
+    },
+    {
+      "name": "af-platform-icons",
+      "type": "registry:component",
+      "title": "AF Platform Icons",
+      "description": "8 platform brand icons as SVG components — WhatsApp, Gmail, FB, IG, Telegram, iMessage, Phone, Mail. Bundled exports + name-keyed map.",
+      "files": [
+        {
+          "path": "components/af-platform-icons/af-platform-icons.tsx",
+          "type": "registry:component"
+        }
+      ],
+      "dependencies": [
+        "react"
+      ]
+    },
+    {
+      "name": "af-ios-notification",
+      "type": "registry:component",
+      "title": "AF iOS Notification",
+      "description": "iOS notification banner with Liquid-Glass container. Drops into iphone-chassis or standalone web/app surfaces.",
+      "files": [
+        {
+          "path": "components/af-ios-notification/af-ios-notification.tsx",
+          "type": "registry:component"
+        }
+      ],
+      "dependencies": [
+        "react"
+      ],
+      "registryDependencies": [
+        "af-tokens",
+        "liquid-glass-frame"
+      ]
     }
   ]
 }
