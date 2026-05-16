@@ -58,6 +58,20 @@
       "registryDependencies": ["af-tokens", "iphone-chassis"]
     },
     {
+      "name": "macbook-pro-chassis",
+      "type": "registry:component",
+      "title": "MacBook Pro Chassis",
+      "description": "Reusable MacBook Pro device-frame for AF surfaces — desktop-tier sibling to iphone-chassis. 16:10 lid + hinge + base strip. Variants: space-gray, silver. Sizes: compact (480px), default (560-640px), hero (720-880px), fluid (width-constrained at min(80vw, 1000px)). AF wallpaper fallback. Per Joe directive 2026-05-17: use Macs for desktop versions where useful, iPhone on mobile. preflight-device-mock skill MUST fire before real-surface use.",
+      "files": [
+        {
+          "path": "components/macbook-pro-chassis/macbook-pro-chassis.tsx",
+          "type": "registry:component"
+        }
+      ],
+      "dependencies": ["react"],
+      "registryDependencies": ["af-tokens"]
+    },
+    {
       "name": "liquid-glass-frame",
       "type": "registry:component",
       "title": "Liquid-Glass Frame",
