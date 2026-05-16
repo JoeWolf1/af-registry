@@ -20,11 +20,26 @@
  *   npx shadcn add https://raw.githubusercontent.com/JoeWolf1/af-registry/main/public/r/iphone-chassis.json
  *   npx shadcn add https://raw.githubusercontent.com/JoeWolf1/af-registry/main/public/r/three-phase-iphone-hero.json
  *
+ * Layout:
+ *   2-column grid on desktop. LEFT: scrollable per-phase commentary slots
+ *   (3 stacked, ~80vh each, providing scroll distance). RIGHT: sticky iPhone
+ *   at top-[10vh], h-fit (sizes to iPhone naturally, no overflow).
+ *
+ *   As the visitor scrolls, IntersectionObserver detects which commentary
+ *   slot is in viewport center and swaps the iPhone screen content to match.
+ *
+ *   Mobile (lg-): all 3 phases stack vertically as static iPhones.
+ *
  * Usage:
  *   <ThreePhaseIphoneHero
- *     phase1={<WhatsAppChatMessages messages={...} />}    // documentary
- *     phase2="Wann bist DU dran?"                          // pivot splash
- *     phase3={<ReelsFeed customer="..." />}                // future-self
+ *     phase1={<WhatsAppChatMessages messages={...} />}
+ *     phase2="Wann bist DU dran?"
+ *     phase3={<ReelsFeed customer="..." />}
+ *     commentary={[
+ *       <p>Phase 1 commentary text — Hans Bauer's last 5 leads</p>,
+ *       null, // splash speaks for itself
+ *       <p>Phase 3 commentary text — this is your inbox in 6 months</p>,
+ *     ]}
  *     caption="Hans Bauer — HOBA Energietechnik"
  *   />
  *
@@ -55,12 +70,14 @@ export interface ThreePhaseIphoneHeroProps {
   phase2: string | ReactNode;
   /** Phase 3 content — future-self projection (visitor's own outcome in same medium). */
   phase3: ReactNode;
+  /**
+   * Optional per-phase commentary rendered in the scrollable left column.
+   * Tuple of [phase1Commentary, phase2Commentary, phase3Commentary].
+   * Pass `null` for any phase to leave its slot empty (still contributes scroll distance).
+   */
+  commentary?: [ReactNode, ReactNode, ReactNode];
   /** Caption below the iPhone — typically customer attribution. */
   caption?: ReactNode;
-  /** iPhone chassis size — see IPhoneChassis. */
-  size?: 'compact' | 'default' | 'hero';
-  /** Pin the iPhone during scroll-pivot — recommended for hero placement. */
-  pinned?: boolean;
   /** Optional extra classes on the wrapper. */
   className?: string;
 }
@@ -71,9 +88,8 @@ export function ThreePhaseIphoneHero({
   phase1,
   phase2,
   phase3,
+  commentary,
   caption,
-  size = 'hero',
-  pinned = true,
   className,
 }: ThreePhaseIphoneHeroProps) {
   const sectionRef = useRef<HTMLDivElement>(null);
@@ -86,15 +102,12 @@ export function ThreePhaseIphoneHero({
   // - Zero runtime dependency (GSAP is +27KB)
   // - Sufficient precision for 3-phase progression (we're not doing scrub/parallax)
   // - prefers-reduced-motion respected by skipping the observer entirely
-  //
-  // Upgrade path: if the surface needs scrub-tied animations between phases
-  // (e.g. continuous transform interpolation), swap to GSAP ScrollTrigger.
   // ---------------------------------------------------------------------------
   useEffect(() => {
     const root = sectionRef.current;
     if (!root) return;
 
-    // Respect prefers-reduced-motion: show all phases as static, no progression
+    // Respect prefers-reduced-motion: show phase 1 statically, no progression
     if (typeof window !== 'undefined') {
       const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
       if (reduced) {
@@ -117,7 +130,8 @@ export function ThreePhaseIphoneHero({
         }
       },
       {
-        rootMargin: '-40% 0px -40% 0px', // fires when sentinel is near viewport center
+        // Fire when sentinel is roughly in the viewport center
+        rootMargin: '-40% 0px -40% 0px',
         threshold: 0,
       },
     );
@@ -137,52 +151,93 @@ export function ThreePhaseIphoneHero({
     3: phase3,
   };
 
+  const phaseLabels: Record<Phase, string> = {
+    1: 'Heute',
+    2: 'Der Moment',
+    3: 'Morgen',
+  };
+
+  const phaseCommentary: [ReactNode, ReactNode, ReactNode] = commentary ?? [
+    null,
+    null,
+    null,
+  ];
+
   return (
-    <section
+    <div
       ref={sectionRef}
       className={cn(
-        'relative grid grid-cols-1 lg:grid-cols-[1fr_auto_1fr] gap-12 lg:gap-16',
+        'relative grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16',
         className,
       )}
       aria-label="Three-phase narrative — documentary, pivot, future-self"
     >
-      {/* Scroll spacer — left column on desktop; collapses on mobile */}
-      <div className="hidden lg:block" aria-hidden="true">
-        <div data-phase-sentinel="1" className="h-[100vh]" />
-        <div data-phase-sentinel="2" className="h-[100vh]" />
-        <div data-phase-sentinel="3" className="h-[100vh]" />
+      {/* ---- LEFT COLUMN: scrollable per-phase commentary slots ---- */}
+      <div className="hidden lg:flex lg:flex-col">
+        {([1, 2, 3] as const).map((p, idx) => (
+          <div
+            key={p}
+            data-phase-sentinel={p}
+            className="min-h-[80vh] flex flex-col justify-center py-12"
+          >
+            <span
+              className={cn(
+                'text-xs font-semibold tracking-wider uppercase transition-colors duration-300',
+                activePhase === p
+                  ? 'text-[color:var(--af-pulse,#60A5FA)]'
+                  : 'text-[color:var(--af-ink-muted,#14233E)] opacity-50',
+              )}
+            >
+              Phase {p} — {phaseLabels[p]}
+            </span>
+            <div
+              className={cn(
+                'mt-4 text-[color:var(--af-ink,#010E26)] transition-opacity duration-300',
+                activePhase === p ? 'opacity-100' : 'opacity-40',
+              )}
+            >
+              {phaseCommentary[idx] ?? (
+                <p className="text-base text-[color:var(--af-ink-muted,#14233E)] italic">
+                  ({phaseLabels[p]} — Kommentar hier optional)
+                </p>
+              )}
+            </div>
+          </div>
+        ))}
       </div>
 
-      {/* iPhone — pinned during scroll on desktop when pinned=true */}
-      <div
-        className={cn(
-          'flex items-center justify-center',
-          pinned && 'lg:sticky lg:top-[10vh] lg:h-[80vh]',
-        )}
-      >
-        <IPhoneChassis size={size} caption={caption}>
-          <PhaseScreen activePhase={activePhase}>{phaseContent[activePhase]}</PhaseScreen>
-        </IPhoneChassis>
-      </div>
-
-      {/* Phase markers — right column, indicates progression to the visitor */}
-      <PhaseMarkers activePhase={activePhase} />
-
-      {/* Mobile fallback — show all 3 phases stacked (no scroll-pivot) */}
-      <div className="lg:hidden flex flex-col gap-8" aria-hidden="false">
-        <MobilePhase number={1} label="Heute">
-          <IPhoneChassis size="compact">{phase1}</IPhoneChassis>
-        </MobilePhase>
-        <MobilePhase number={2} label="Pivot">
-          <IPhoneChassis size="compact">
-            {typeof phase2 === 'string' ? <PivotSplash text={phase2} /> : phase2}
+      {/* ---- RIGHT COLUMN: sticky iPhone ---- */}
+      <div className="hidden lg:block">
+        <div className="sticky top-[10vh] flex flex-col items-center py-[10vh]">
+          <IPhoneChassis size="default" caption={caption}>
+            <PhaseScreen activePhase={activePhase}>
+              {phaseContent[activePhase]}
+            </PhaseScreen>
           </IPhoneChassis>
-        </MobilePhase>
-        <MobilePhase number={3} label="Morgen">
-          <IPhoneChassis size="compact">{phase3}</IPhoneChassis>
-        </MobilePhase>
+        </div>
       </div>
-    </section>
+
+      {/* ---- MOBILE FALLBACK: all 3 phases stacked vertically ---- */}
+      <div className="lg:hidden flex flex-col gap-12" aria-hidden="false">
+        {([1, 2, 3] as const).map((p, idx) => (
+          <div key={p} className="flex flex-col items-center gap-4">
+            <div className="text-center">
+              <span className="text-xs font-semibold tracking-wider uppercase text-[color:var(--af-pulse,#60A5FA)]">
+                Phase {p} — {phaseLabels[p]}
+              </span>
+              {phaseCommentary[idx] && (
+                <div className="mt-3 px-4 text-sm text-[color:var(--af-ink,#010E26)]">
+                  {phaseCommentary[idx]}
+                </div>
+              )}
+            </div>
+            <IPhoneChassis size="compact" caption={p === 3 ? caption : undefined}>
+              {phaseContent[p]}
+            </IPhoneChassis>
+          </div>
+        ))}
+      </div>
+    </div>
   );
 }
 
@@ -213,7 +268,6 @@ function PhaseScreen({
 
 // ---------------------------------------------------------------------------
 // PivotSplash — Damian's canonical fourth-wall splash treatment for Phase 2.
-// Bold text, breaks the gallery rhythm, addresses the visitor directly.
 // ---------------------------------------------------------------------------
 function PivotSplash({ text }: { text: string }) {
   return (
@@ -237,73 +291,8 @@ function PivotSplash({ text }: { text: string }) {
 }
 
 // ---------------------------------------------------------------------------
-// PhaseMarkers — small indicator showing which phase is active.
-// Sits in the right column on desktop; aids visitor orientation.
-// ---------------------------------------------------------------------------
-function PhaseMarkers({ activePhase }: { activePhase: Phase }) {
-  const labels: Record<Phase, string> = {
-    1: 'Heute',
-    2: '—',
-    3: 'Morgen',
-  };
-
-  return (
-    <div className="hidden lg:flex flex-col items-start gap-6 self-center" aria-hidden="true">
-      {([1, 2, 3] as const).map((p) => (
-        <div key={p} className="flex items-center gap-3">
-          <span
-            className={cn(
-              'inline-block h-2 w-2 rounded-full transition-colors duration-300',
-              activePhase === p
-                ? 'bg-[color:var(--af-pulse,#60A5FA)]'
-                : 'bg-[color:var(--af-border-subtle,rgba(1,14,38,0.10))]',
-            )}
-          />
-          <span
-            className={cn(
-              'text-sm font-medium transition-colors duration-300',
-              activePhase === p
-                ? 'text-[color:var(--af-ink,#010E26)]'
-                : 'text-[color:var(--af-ink-muted,#14233E)] opacity-50',
-            )}
-          >
-            {labels[p]}
-          </span>
-        </div>
-      ))}
-    </div>
-  );
-}
-
-// ---------------------------------------------------------------------------
-// MobilePhase — labeled wrapper for the mobile-fallback stacked layout.
-// ---------------------------------------------------------------------------
-function MobilePhase({
-  number,
-  label,
-  children,
-}: {
-  number: Phase;
-  label: string;
-  children: ReactNode;
-}) {
-  return (
-    <div className="flex flex-col items-center gap-3">
-      <div className="flex items-center gap-2">
-        <span className="text-xs font-semibold tracking-wider uppercase text-[color:var(--af-pulse,#60A5FA)]">
-          Phase {number}
-        </span>
-        <span className="text-sm text-[color:var(--af-ink-muted,#14233E)]">— {label}</span>
-      </div>
-      {children}
-    </div>
-  );
-}
-
-// ---------------------------------------------------------------------------
-// CSS keyframe for fade-in — co-located here to avoid requiring a separate
-// stylesheet install. If your project already has an af-fade-in keyframe,
-// remove this style block.
+// CSS keyframe for fade-in — injected once into the document head.
+// Remove this block if your project already has an af-fade-in keyframe.
 // ---------------------------------------------------------------------------
 if (typeof document !== 'undefined' && !document.querySelector('#af-three-phase-styles')) {
   const style = document.createElement('style');

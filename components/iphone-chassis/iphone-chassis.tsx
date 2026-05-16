@@ -18,6 +18,14 @@
  *     <WhatsAppChat ... />
  *   </IPhoneChassis>
  *
+ *   // With no children, the AF-branded wallpaper renders as the standard fallback:
+ *   <IPhoneChassis caption="AF visual" />
+ *
+ *   // Disable wallpaper for full custom screens:
+ *   <IPhoneChassis wallpaper="none">
+ *     <FullCustomScreen />
+ *   </IPhoneChassis>
+ *
  * IMPORTANT — before using this on a real AF surface with specific content,
  * the preflight-device-mock skill MUST fire (brand-wide rule). The skill
  * enforces the chassis + content matching, accurate device dimensions, and
@@ -33,8 +41,8 @@ function cn(...classes: (string | false | null | undefined)[]): string {
 }
 
 export interface IPhoneChassisProps extends Omit<HTMLAttributes<HTMLDivElement>, 'children'> {
-  /** Screen content — what appears inside the device frame. */
-  children: ReactNode;
+  /** Screen content — what appears inside the device frame. Optional; AF wallpaper renders as fallback. */
+  children?: ReactNode;
   /** Optional caption below the device — e.g. customer name + company. */
   caption?: ReactNode;
   /**
@@ -55,6 +63,17 @@ export interface IPhoneChassisProps extends Omit<HTMLAttributes<HTMLDivElement>,
    * Use for content that needs to fill the screen edge-to-edge (e.g. full-bleed video).
    */
   immersive?: boolean;
+  /**
+   * Screen wallpaper rendered BEHIND children:
+   * - `'af'` (default) — AF-branded wallpaper (purple→blue gradient + grid + glow spots).
+   *   Status [joe-proxy] — Damian validation pending. Override with explicit children to hide.
+   * - `'none'` — no wallpaper, fully transparent screen background.
+   * - ReactNode — custom wallpaper element.
+   *
+   * Children, when provided, render OVER the wallpaper. Pass `wallpaper="none"` if the
+   * children fill the screen and you want zero overhead from the fallback layer.
+   */
+  wallpaper?: 'af' | 'none' | ReactNode;
 }
 
 export function IPhoneChassis({
@@ -63,6 +82,7 @@ export function IPhoneChassis({
   variant = 'ink',
   size = 'default',
   immersive = false,
+  wallpaper = 'af',
   className,
   ...rest
 }: IPhoneChassisProps) {
@@ -77,12 +97,19 @@ export function IPhoneChassis({
       ? 'bg-[color:var(--af-ink,#010E26)] border-[color:var(--af-ink-muted,#14233E)]'
       : 'bg-[color:var(--af-paper,#FFFFFF)] border-[color:var(--af-border-strong,rgba(1,14,38,0.20))]';
 
+  const wallpaperEl: ReactNode =
+    wallpaper === 'none'
+      ? null
+      : wallpaper === 'af'
+        ? <AfWallpaper />
+        : wallpaper;
+
   return (
     <figure className={cn('flex flex-col items-center gap-4', className)} {...rest}>
       <div
         className={cn(
           // Device-frame outer — rounded rectangle, AF brand-canon dimensions ~9:19.5 aspect
-          'relative aspect-[9/19.5] rounded-[44px] border-[3px] shadow-2xl',
+          'relative aspect-[9/19.5] rounded-[44px] border-[3px]',
           'shadow-[0_20px_60px_-10px_var(--af-ink-glow-30,rgba(1,14,38,0.30)),0_8px_24px_-4px_var(--af-pulse-glow-12,rgba(96,165,250,0.12))]',
           sizeClasses,
           frameColor,
@@ -95,6 +122,13 @@ export function IPhoneChassis({
             'bg-[color:var(--af-paper,#FFFFFF)]',
           )}
         >
+          {/* Wallpaper layer — sits BEHIND children (z-0) */}
+          {wallpaperEl && (
+            <div className="absolute inset-0 z-0" aria-hidden="true">
+              {wallpaperEl}
+            </div>
+          )}
+
           {/* Notch — Dynamic-Island style, omitted in immersive mode */}
           {!immersive && (
             <div
@@ -115,7 +149,10 @@ export function IPhoneChassis({
                 'absolute left-0 right-0 top-0 z-10',
                 'flex items-center justify-between',
                 'px-7 pt-[14px] text-[11px] font-semibold',
-                'text-[color:var(--af-ink,#010E26)]',
+                // Use white text when AF wallpaper is on (it's dark); ink otherwise
+                wallpaper === 'af'
+                  ? 'text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.4)]'
+                  : 'text-[color:var(--af-ink,#010E26)]',
               )}
             >
               <span>9:41</span>
@@ -123,8 +160,8 @@ export function IPhoneChassis({
             </div>
           )}
 
-          {/* Screen content slot */}
-          <div className={cn('relative h-full w-full', !immersive && 'pt-12')}>
+          {/* Screen content slot — renders OVER the wallpaper (z-10) */}
+          <div className={cn('relative z-10 h-full w-full', !immersive && 'pt-12')}>
             {children}
           </div>
         </div>
@@ -166,5 +203,46 @@ export function IPhoneChassis({
         </figcaption>
       )}
     </figure>
+  );
+}
+
+/**
+ * AfWallpaper — the AF-canonical iPhone wallpaper.
+ *
+ * Status: [joe-proxy] — Joe-set fallback per directive 2026-05-17 with reference
+ * image showing purple-violet upper-left → AF-pulse-blue lower-right gradient
+ * with subtle grid overlay + two ambient glow spots. The PURPLE hue is not
+ * formally in AF canon yet (canon is Ink-Paper-Pulse + AFVQ-blue + Liquid-Glass);
+ * queued for Damian validation at ~/.claude/skills/af-design-catalog/PENDING-DAMIAN-VALIDATION.md.
+ *
+ * Composition:
+ *   - Base linear-gradient: deep purple → deep navy → deep blue (135deg)
+ *   - Two radial glow spots: violet at top-left, AF-pulse at bottom-right
+ *   - Subtle 40px grid overlay at low opacity
+ */
+export function AfWallpaper() {
+  return (
+    <div
+      className="h-full w-full"
+      style={{
+        background: `
+          radial-gradient(ellipse 70% 50% at 22% 18%, rgba(140, 92, 246, 0.85) 0%, rgba(140, 92, 246, 0.0) 55%),
+          radial-gradient(ellipse 50% 40% at 78% 82%, rgba(96, 165, 250, 0.75) 0%, rgba(96, 165, 250, 0.0) 60%),
+          linear-gradient(135deg, #2a1f5c 0%, #1c1c4a 35%, #131a3a 65%, #0e1830 100%)
+        `,
+      }}
+    >
+      {/* Grid overlay — subtle 40px graph-paper texture */}
+      <div
+        className="absolute inset-0"
+        style={{
+          backgroundImage: `
+            linear-gradient(rgba(255, 255, 255, 0.06) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(255, 255, 255, 0.06) 1px, transparent 1px)
+          `,
+          backgroundSize: '40px 40px',
+        }}
+      />
+    </div>
   );
 }
