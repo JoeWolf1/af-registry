@@ -27,14 +27,35 @@
         }
       ],
       "dependencies": ["react"],
-      "registryDependencies": ["af-tokens"],
-      "tailwind": {
-        "config": {
-          "theme": {
-            "extend": {}
-          }
+      "registryDependencies": ["af-tokens"]
+    },
+    {
+      "name": "iphone-chassis",
+      "type": "registry:component",
+      "title": "iPhone Chassis",
+      "description": "Reusable iPhone device-frame chassis for AF surfaces. Slot-based — content fills the screen; chassis renders frame, notch, status bar, side buttons. Variants: ink (Damian-canonical), paper. Sizes: compact, default, hero. immersive prop hides notch + status bar for full-bleed content. Lifted from zusammenarbeit.anfragenfluss.de chassis pattern per af-brand-doctrine \"1:1 nachbauen\" authority. preflight-device-mock skill MUST fire before real-surface use.",
+      "files": [
+        {
+          "path": "components/iphone-chassis/iphone-chassis.tsx",
+          "type": "registry:component"
         }
-      }
+      ],
+      "dependencies": ["react"],
+      "registryDependencies": ["af-tokens"]
+    },
+    {
+      "name": "three-phase-iphone-hero",
+      "type": "registry:component",
+      "title": "Three-Phase iPhone Hero",
+      "description": "Narrative-arc orchestrator for AF Experience-Page surfaces. Documentary evidence → pivot question → future-self projection. Uses IntersectionObserver-based scroll-pivot to progress phases; pinned iPhone on desktop, stacked fallback on mobile. Phase 2 accepts string (canonical splash treatment) or ReactNode (custom). Must use 3 DIFFERENT mediums across phases per af-brand-doctrine § 2.",
+      "files": [
+        {
+          "path": "components/three-phase-iphone-hero/three-phase-iphone-hero.tsx",
+          "type": "registry:component"
+        }
+      ],
+      "dependencies": ["react"],
+      "registryDependencies": ["af-tokens", "iphone-chassis"]
     }
   ]
 }
