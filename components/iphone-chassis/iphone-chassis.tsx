@@ -221,26 +221,29 @@ export function IPhoneChassis({
 }
 
 /**
- * AfWallpaper — the AF-canonical iPhone wallpaper.
+ * AfWallpaper — the AF-canonical iPhone wallpaper (4 selectable variants).
  *
- * Status: [joe-proxy] — Joe-set fallback per directive 2026-05-17 with reference
- * image showing purple-violet upper-left → AF-pulse-blue lower-right gradient
- * with subtle grid overlay + two ambient glow spots. The PURPLE hue is not
- * formally in AF canon yet (canon is Ink-Paper-Pulse + AFVQ-blue + Liquid-Glass);
- * queued for Damian validation at ~/.claude/skills/af-design-catalog/PENDING-DAMIAN-VALIDATION.md.
+ * Status: [joe-proxy] — variants for Joe to review and pick the canonical
+ * one; queued for Damian validation at ~/.claude/skills/af-design-catalog/PENDING-DAMIAN-VALIDATION.md.
  *
- * Composition (size-adaptive — works on any chassis from compact iPhone to hero MacBook):
+ * Composition (shared across variants):
  *   - Base linear-gradient: deep purple → deep navy → deep blue (135deg)
  *   - Two radial glow spots positioned by percentage: violet at 22%/18%,
  *     AF-pulse at 78%/82% — auto-adapt to any aspect ratio
- *   - Grid overlay sized by percentage (8% × 8%) — always ~12 columns × 12
- *     rows regardless of chassis size. Looks coherent on compact phones AND
- *     wide MacBooks AND fluid sizes in between.
+ *   - Pattern overlay — VARIANT-SPECIFIC. See `variant` prop.
+ *
+ * IMPORTANT: pattern uses FIXED PIXEL SIZES (e.g. '40px 40px') — never
+ * percentages — because percentage backgroundSize uses each axis independently
+ * and produces rectangles on non-square chassis (a 9:19.5 iPhone with 8% × 8%
+ * gives tall rectangles, NOT squares). Fixed-px guarantees squares regardless
+ * of aspect ratio.
  */
-export function AfWallpaper() {
+export type AfWallpaperVariant = 'grid' | 'dots' | 'mesh' | 'minimal';
+
+export function AfWallpaper({ variant = 'grid' }: { variant?: AfWallpaperVariant }) {
   return (
     <div
-      className="h-full w-full"
+      className="absolute inset-0 h-full w-full"
       style={{
         background: `
           radial-gradient(ellipse 70% 50% at 22% 18%, rgba(140, 92, 246, 0.85) 0%, rgba(140, 92, 246, 0.0) 55%),
@@ -249,17 +252,42 @@ export function AfWallpaper() {
         `,
       }}
     >
-      {/* Grid overlay — size-relative graph-paper texture (8% × 8% = ~12 cells) */}
-      <div
-        className="absolute inset-0"
-        style={{
-          backgroundImage: `
-            linear-gradient(rgba(255, 255, 255, 0.06) 1px, transparent 1px),
-            linear-gradient(90deg, rgba(255, 255, 255, 0.06) 1px, transparent 1px)
-          `,
-          backgroundSize: '8% 8%',
-        }}
-      />
+      {/* Pattern overlay — selectable variant */}
+      {variant === 'grid' && (
+        <div
+          className="absolute inset-0"
+          style={{
+            backgroundImage: `
+              linear-gradient(rgba(255, 255, 255, 0.06) 1px, transparent 1px),
+              linear-gradient(90deg, rgba(255, 255, 255, 0.06) 1px, transparent 1px)
+            `,
+            backgroundSize: '40px 40px',
+          }}
+        />
+      )}
+      {variant === 'dots' && (
+        <div
+          className="absolute inset-0"
+          style={{
+            backgroundImage:
+              'radial-gradient(rgba(255, 255, 255, 0.18) 1.2px, transparent 1.4px)',
+            backgroundSize: '32px 32px',
+          }}
+        />
+      )}
+      {variant === 'mesh' && (
+        <div
+          className="absolute inset-0"
+          style={{
+            background: `
+              radial-gradient(circle at 50% 30%, rgba(167, 139, 250, 0.3) 0%, transparent 35%),
+              radial-gradient(circle at 30% 65%, rgba(96, 165, 250, 0.25) 0%, transparent 35%),
+              radial-gradient(circle at 75% 50%, rgba(216, 180, 254, 0.2) 0%, transparent 35%)
+            `,
+          }}
+        />
+      )}
+      {/* `minimal` = gradient + glows only, no pattern overlay */}
     </div>
   );
 }

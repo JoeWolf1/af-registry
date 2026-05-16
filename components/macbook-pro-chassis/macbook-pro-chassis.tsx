@@ -101,11 +101,6 @@ export function MacbookProChassis({
       ? 'bg-[color:var(--af-ink-muted,#14233E)]'
       : 'bg-[#C0C3C8]';
 
-  const hingeColor =
-    variant === 'space-gray'
-      ? 'bg-[color:var(--af-ink,#010E26)]'
-      : 'bg-[#A8ABB2]';
-
   const wallpaperEl: ReactNode =
     wallpaper === 'none'
       ? null
@@ -114,7 +109,7 @@ export function MacbookProChassis({
         : wallpaper;
 
   return (
-    <figure className={cn('flex flex-col items-center gap-2', className)} {...rest}>
+    <figure className={cn('flex flex-col items-center', className)} {...rest}>
       {/* ---- Lid (screen) ---- */}
       <div
         className={cn(
@@ -179,23 +174,23 @@ export function MacbookProChassis({
         </div>
       </div>
 
-      {/* ---- Hinge + base strip ---- */}
-      {/* Subtle horizontal strip beneath lid suggests the laptop base without */}
-      {/* drawing a full keyboard. Width matches lid bottom; height ~2% of lid. */}
+      {/* ---- Base / hinge strip ----
+          Directly attached to the lid bottom — no gap, no floating screen.
+          Width: 105% of lid (extends slightly to suggest keyboard deck plane).
+          Height: 10px (visible plane without dominating).
+          Rounded-b: matches lid corner-radius treatment for visual continuity. */}
       <div
         aria-hidden="true"
-        className={cn('relative flex flex-col items-center', sizeClasses)}
-      >
-        {/* Hinge — thin dark line right under lid */}
-        <div className={cn('h-[3px] w-[60%] rounded-b-sm', hingeColor)} />
-        {/* Base — slightly wider, suggests the trackpad/keyboard plane */}
-        <div
-          className={cn(
-            'h-[6px] w-[110%] rounded-b-[10px] shadow-[0_4px_8px_-2px_var(--af-ink-glow-16,rgba(1,14,38,0.16))]',
-            baseColor,
-          )}
-        />
-      </div>
+        className={cn(
+          'relative -mt-[2px] h-[10px] rounded-b-[14px]',
+          'shadow-[0_6px_12px_-2px_var(--af-ink-glow-16,rgba(1,14,38,0.16))]',
+          // Subtle gradient — top edge slightly darker (hinge crease) → lighter base
+          'before:absolute before:inset-x-0 before:top-0 before:h-[2px] before:rounded-t-sm',
+          variant === 'space-gray' ? 'before:bg-black/30' : 'before:bg-black/15',
+          baseColor,
+        )}
+        style={{ width: '105%' }}
+      />
 
       {caption && (
         <figcaption className="mt-3 text-center text-sm text-[color:var(--af-ink-muted,#14233E)]">
