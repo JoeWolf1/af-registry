@@ -644,9 +644,63 @@ Atomic commits per change (per `~/.claude/rules/atomic-commit.md`). Commit messa
 
 ---
 
+## 11. The interface — inline AFCO chat (Joe directive 2026-05-17)
+
+The operator interface for the generator is **inline AFCO chat**. The operator asks AFCO in chat (*"generate the HOBA Fallstudien"*), AFCO walks the 8-step procedure conversationally, emits artifacts inline (Step 4 mock-up as ASCII-art, Step 8 page as committed code), the operator approves or rejects at the Gate 7 checkpoint, AFCO commits the final code to git and pushes.
+
+**Why this interface, not CLI / web UI / admin panel** (decided 2026-05-17): at solo-operator scale (≤25 customers per the af-werkschau lab Part C.2), inline-chat is the cheapest and fastest path to a customer page. Zero new infrastructure to build — no CLI scaffolding, no preview route, no admin panel. Composes with the AFCO + Claude Code workflow Joe already uses daily. Trade-off accepted: the mock-up is ephemeral (lives in the chat transcript only) unless explicitly persisted to disk; the audit trail is the git commit history rather than a formal approval log.
+
+**Graduation signals to a heavier interface** (any one fires the re-evaluation):
+- 25+ customers — makes admin-panel build justified per af-werkschau lab Part C.2
+- Non-developer needs to add customers without touching git (assistant role, VA, sales team)
+- Damian wants to add customers from his own machine without an AFCO session running
+- Mock-up audit history becomes load-bearing (regulatory, governance, multi-stakeholder approval)
+
+Until any of those fire, inline AFCO chat is the interface.
+
+### The chat invocation shape
+
+```
+Joe / Damian:  "Generate the HOBA Fallstudien using the doctrine."
+
+AFCO:
+  Step 1 — Parse data + validate schema                    [internal]
+  Step 2 — Designed Moment gate per section                [internal]
+  Step 3 — Pick primitives from registry (tentative)       [internal]
+  Step 4 — Emit structural mock-up                         [VISIBLE in chat]
+
+Joe / Damian:  "Approved" | "Revise section X" | "Restructure entirely"
+
+AFCO (if approved):
+  Step 5 — Compose motion (Lens 3 timing canon)            [internal]
+  Step 6 — Web-design hygiene pass                          [internal]
+  Step 7 — Brand-canon checks                               [internal]
+  Step 8 — Emit page code + atomic commits + push           [VISIBLE: commit URLs]
+
+AFCO surfaces: commit SHA + GitHub commit URL + Vercel preview URL + Round-Trip
+Screenshot Test scores per viewport.
+```
+
+### Persistence opt-in for mock-ups
+
+By default, the Step 4 mock-up lives only in the chat transcript (ephemeral — disappears with the session). If the operator wants it persisted for audit / reference / future iteration, they say so at approval time. Canonical home: `~/Projects/af-registry/mocks/<YYYY-MM-DD>-<customer-slug>-step4.md` (co-located with the doctrine doc). Format: the ASCII art + a short metadata header naming customer, generator type, date, approval status.
+
+### Composition with other rules
+
+- `feedback_research_presentation_style.md` § Walkthrough-section shape — Step 4 mock-up emission follows the shape exactly (substantive context + visual spacing + recap + picker for approve/revise/restructure)
+- `~/.claude/rules/atomic-commit.md` — Step 8 emits atomic commits per logical boundary (per-section commits when the page is built up in stages)
+- `~/.claude/rules/inspection-links.md` — Step 8 surfaces the preview URL after deploy, per the "🔗 See it live now" headline rule
+- `~/.claude/rules/ntfy-notifications.md` — long-running Step 8 commits + deploy (>2 min wall-clock) fires an ntfy ping when complete
+
+### Dry-run validation (2026-05-17)
+
+The inline-chat interface was dry-run end-to-end on the HOBA Fallstudien page on the night of 2026-05-17. Steps 1-4 executed; Step 4 mock-up emitted; operator approved at Gate 7. Steps 5-8 deferred to a fresh-eyes session per fatigue. The dry-run validated that the interface works without new infrastructure and that the operator review loop at Gate 7 is the right place for the approve/reject decision. Reference incident: this session's chat transcript.
+
+---
+
 ## Status + open questions
 
-**Status (2026-05-17):** v1.2. Default Anfragenfluss Mode defined (§§ 1-6). Pre-mortem inventory (§ 7). Future expansion sketched in three groups (§ 8). v1.2 adds Step 4 (structural mock-up emission) + Gate 7 (mock-up reviewed before emit) per Joe directive 2026-05-17 (image-driven addition: the generator should produce an ASCII layout sketch BEFORE actually building the page). v1.1 incorporated Damian's Holbeinstraße directive (anticipatory thinking + pre-mortem framing). v1.0 was the first draft without that input.
+**Status (2026-05-17):** v1.3. Default Anfragenfluss Mode defined (§§ 1-6). Pre-mortem inventory (§ 7). Future expansion sketched in three groups (§ 8). Operator interface settled in § 11 (inline AFCO chat, per Joe directive 2026-05-17 — graduation signals to CLI / admin-UI named). v1.3 adds § 11 after the HOBA Fallstudien dry-run validated the inline-chat shape end-to-end. v1.2 added Step 4 (structural mock-up emission) + Gate 7 (mock-up reviewed before emit) per Joe directive 2026-05-17 (image-driven addition: the generator should produce an ASCII layout sketch BEFORE actually building the page). v1.1 incorporated Damian's Holbeinstraße directive (anticipatory thinking + pre-mortem framing). v1.0 was the first draft without that input.
 
 **Open questions for Joe + Damian:**
 
