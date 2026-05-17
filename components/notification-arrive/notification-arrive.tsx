@@ -10,6 +10,14 @@
  * vs SwipeIn's clean ease-out. The overshoot is what makes it FEEL like a real
  * notification rather than just sliding content.
  *
+ * Direction (engraved 2026-05-17 per device-authenticity lab):
+ *   - 'top' (default) — iOS drop-from-top with spring settle. Pairs with
+ *     af-ios-notification + iphone-chassis.
+ *   - 'right' — macOS Notification Center slide-from-right. Pairs with
+ *     macos-notification-banner + macbook-pro-chassis (per af-surfaces lab
+ *     report 2026-05-17 § Tier-1 #2). The unified animation primitive avoids
+ *     forking the spring math across platforms.
+ *
  * Install:
  *   npx shadcn add https://raw.githubusercontent.com/JoeWolf1/af-registry/main/public/r/notification-arrive.json
  *
@@ -18,8 +26,8 @@
  *     <AfIosNotification appName="WhatsApp" title="Damian" body="Wann der Call?" />
  *   </NotificationArrive>
  *
- *   <NotificationArrive delayMs={2000} replayKey={msgCount}>
- *     <CustomBanner />
+ *   <NotificationArrive direction="right" delayMs={2000} replayKey={msgCount}>
+ *     <MacosNotificationBanner appName="WhatsApp" title="Damian" body="Wann der Call?" />
  *   </NotificationArrive>
  */
 
@@ -34,7 +42,7 @@ function cn(...classes: (string | false | null | undefined)[]): string {
 
 export interface NotificationArriveProps extends Omit<HTMLAttributes<HTMLDivElement>, 'children'> {
   children: ReactNode;
-  /** Drop distance in px (how far above the resting position it starts). Default 56. */
+  /** Drop/slide distance in px (how far from the resting position it starts). Default 56. */
   distance?: number;
   /** Animation duration in ms. Default 620 (includes spring settle). */
   durationMs?: number;
@@ -53,6 +61,13 @@ export interface NotificationArriveProps extends Omit<HTMLAttributes<HTMLDivElem
   replayKey?: string | number;
   /** When false, the element stays in resting position. Default true. */
   enabled?: boolean;
+  /**
+   * Direction the notification arrives FROM. Default 'top' (iOS drop-from-top
+   * with spring settle). Use 'right' for macOS Notification Center slide-from-right
+   * behavior. Required by the macos-notification-banner registry entry per
+   * af-surfaces/2026-05-17-device-authenticity-audit § Tier-1 #1+2.
+   */
+  direction?: 'top' | 'right';
 }
 
 export function NotificationArrive({
@@ -63,6 +78,7 @@ export function NotificationArrive({
   easing = 'cubic-bezier(0.34, 1.56, 0.64, 1)',
   replayKey,
   enabled = true,
+  direction = 'top',
   className,
   style,
   ...rest
@@ -88,10 +104,17 @@ export function NotificationArrive({
   // (Smashing 2025). AF Werkschau lab report 2026-05-16 § A.5.
   const motionOff = reducedMotion || !enabled;
 
-  // From: above + slightly squeezed. To: resting at full scale.
+  // Per direction: 'top' = drop from above (y axis), 'right' = slide from right
+  // edge (x axis). Same spring math, same overshoot, same scale-squeeze (0.94)
+  // — just the axis flips. The transformOrigin tracks the FROM edge so the
+  // scale appears to grow from the entry point, not from the center.
+  const offset = direction === 'right'
+    ? { x: distance, y: 0 }
+    : { x: 0, y: -distance };
+
   const transform = motionOff || arrived
     ? 'translate3d(0,0,0) scale(1)'
-    : `translate3d(0, ${-distance}px, 0) scale(0.94)`;
+    : `translate3d(${offset.x}px, ${offset.y}px, 0) scale(0.94)`;
 
   return (
     <div
@@ -106,7 +129,7 @@ export function NotificationArrive({
         // Reduced-motion users skip the promotion entirely.
         // AF Werkschau lab report 2026-05-16 § A.6.
         willChange: motionOff || arrived ? 'auto' : 'transform, opacity',
-        transformOrigin: 'top center',
+        transformOrigin: direction === 'right' ? 'right center' : 'top center',
         ...style,
       }}
       {...rest}

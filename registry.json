@@ -267,7 +267,7 @@
       "name": "notification-arrive",
       "type": "registry:component",
       "title": "Notification Arrive",
-      "description": "Animation primitive — iOS-style drop-from-top with spring settle (mild overshoot). Wraps a notification banner (af-ios-notification, liquid-glass-frame, etc.) to give it the canonical iOS 'ding!' arrival motion: drops down + scales slightly + settles. Distinct from SwipeIn because of the spring overshoot — that's what makes it FEEL like a real notification. Used for kundenstimmen pages showing real notifications from leads / customers arriving in real time. Modular: HOC-style, composes with any child. Honors `prefers-reduced-motion`.",
+      "description": "Animation primitive — drop-from-top (iOS) OR slide-from-right (macOS) with spring settle (mild overshoot). Wraps a notification banner (af-ios-notification, macos-notification-banner, liquid-glass-frame) to give it the canonical 'ding!' arrival motion: enters from the FROM edge + scales slightly + settles. New `direction='top' | 'right'` prop (default 'top') selects iOS vs macOS axis — same spring math, same overshoot, axis flips per platform. Distinct from SwipeIn because of the spring overshoot — that's what makes it FEEL like a real notification. Used for kundenstimmen pages showing real notifications from leads / customers arriving in real time. Modular: HOC-style, composes with any child. Honors `prefers-reduced-motion`.",
       "files": [
         {
           "path": "components/notification-arrive/notification-arrive.tsx",
