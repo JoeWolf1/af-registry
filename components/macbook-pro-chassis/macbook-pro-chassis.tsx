@@ -48,10 +48,12 @@ export interface MacbookProChassisProps extends Omit<HTMLAttributes<HTMLDivEleme
   caption?: ReactNode;
   /**
    * Visual variant for the device frame:
-   * - `space-gray` (default) — dark frame, modern MacBook Pro
-   * - `silver` — light frame
+   * - `space-black` — Apple Space Black (#1D1D1F). Correct choice for dark hero
+   *   backgrounds. Source: ~/Anfragenfluss-style/audits/macbook-pro-m4-mockup.md §13.
+   * - `space-gray` (default) — Apple Space Gray (#3A3A3C), neutral dark aluminum.
+   * - `silver` — Apple Silver (#D7D9DD), light frame for paper/light backgrounds.
    */
-  variant?: 'space-gray' | 'silver';
+  variant?: 'space-black' | 'space-gray' | 'silver';
   /**
    * Device size — controls overall scale.
    * - `compact` — for inline use (~480px wide, fixed)
@@ -91,15 +93,38 @@ export function MacbookProChassis({
     fluid: 'w-[min(80vw,1000px)]',
   }[size];
 
+  // Chassis tones — Apple-canon hex values per ~/Anfragenfluss-style/audits/macbook-pro-m4-mockup.md §4.
+  // Calibration: medium (community-canonical photographic samples of apple.com hero renders;
+  // Apple does not publish official hex values).
+  // BUGFIX 2026-05-17: `space-gray` was previously mapped to --af-ink (#010E26), the AF brand's
+  // navy text/ink token — NOT an aluminum color. Remapped to actual Apple Space Gray. Never bit
+  // because no consumer used variant="space-gray" before (grep verified 2026-05-17). See lab
+  // report: ~/lab-reports/2026/af-surfaces/2026-05-17-macbook-chassis-precision-elegance.md F2.
   const frameColor =
-    variant === 'space-gray'
-      ? 'bg-[color:var(--af-ink,#010E26)] border-[color:var(--af-ink-muted,#14233E)]'
-      : 'bg-[#D7D9DD] border-[#B3B6BC]'; // Apple-canon silver tone (Joe-proxy)
+    variant === 'space-black'
+      ? 'bg-[#1D1D1F] border-[#3A3A3D]'      // Apple Space Black — dark hero contexts
+      : variant === 'space-gray'
+        ? 'bg-[#3A3A3C] border-[#505053]'    // Apple Space Gray — neutral dark aluminum
+        : 'bg-[#D7D9DD] border-[#B3B6BC]';   // Apple Silver — light/paper contexts
 
+  // Base deck plane — slightly lighter than body, suggests keyboard deck behind lid.
   const baseColor =
-    variant === 'space-gray'
-      ? 'bg-[color:var(--af-ink-muted,#14233E)]'
-      : 'bg-[#C0C3C8]';
+    variant === 'space-black'
+      ? 'bg-[#2D2D2F]'
+      : variant === 'space-gray'
+        ? 'bg-[#2C2C2E]'
+        : 'bg-[#C0C3C8]';
+
+  // Lid drop shadow — context-aware per ~/Anfragenfluss-style/audits/macbook-pro-m4-mockup.md §9.
+  // Silver chassis sits on paper/light bgs → AFVQ ink-tinted shadow (brand glow on paper).
+  // Space Black / Space Gray sit on dark bgs → neutral-black shadow at lower alpha; the
+  // ink-tinted shadow vanishes against a near-ink-colored bg (audit §9: "Use only on light
+  // backgrounds; on AFVQ dark sections, skip — faking [it] on a non-reflective dark
+  // background reads as artifice.").
+  const lidShadow =
+    variant === 'silver'
+      ? 'shadow-[0_30px_80px_-12px_var(--af-ink-glow-30,rgba(1,14,38,0.30)),0_12px_32px_-4px_var(--af-pulse-glow-12,rgba(96,165,250,0.12))]'
+      : 'shadow-[0_16px_48px_-12px_rgba(0,0,0,0.45),0_6px_20px_-4px_rgba(0,0,0,0.25)]';
 
   const wallpaperEl: ReactNode =
     wallpaper === 'none'
@@ -119,7 +144,7 @@ export function MacbookProChassis({
         className={cn(
           // Lid outer frame — 16:10 aspect ratio (canonical MacBook Pro display)
           'relative aspect-[16/10] w-full rounded-[18px] border-[3px]',
-          'shadow-[0_30px_80px_-12px_var(--af-ink-glow-30,rgba(1,14,38,0.30)),0_12px_32px_-4px_var(--af-pulse-glow-12,rgba(96,165,250,0.12))]',
+          lidShadow,
           frameColor,
         )}
       >
@@ -201,7 +226,8 @@ export function MacbookProChassis({
           'shadow-[0_6px_12px_-2px_var(--af-ink-glow-16,rgba(1,14,38,0.16))]',
           // Subtle gradient — top edge slightly darker (hinge crease) → lighter base
           'before:absolute before:inset-x-0 before:top-0 before:h-[2px] before:rounded-t-sm',
-          variant === 'space-gray' ? 'before:bg-black/30' : 'before:bg-black/15',
+          // Hinge crease — darker top edge on dark variants; lighter on silver.
+          variant === 'silver' ? 'before:bg-black/15' : 'before:bg-black/30',
           baseColor,
         )}
       />
