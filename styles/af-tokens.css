@@ -113,6 +113,24 @@
 
   /* Canonical easings */
   --af-ease-out-soft:  cubic-bezier(0.16, 1, 0.3, 1);
+
+  /* ─── MacBook chassis tones ────────────────────────────────────────────
+   * Apple-canon hex approximations per
+   * ~/Anfragenfluss-style/audits/macbook-pro-m4-mockup.md §4.
+   * Calibration: medium (community-canonical photographic samples of apple.com
+   * hero renders; Apple does not publish official hex values).
+   * Consumed by the macbook-pro-chassis component `variant` prop. Don't use
+   * directly — go through the component so chassis geometry and shadow stay paired.
+   * ─────────────────────────────────────────────────────────────────── */
+  --af-chassis-space-black:      #1D1D1F;
+  --af-chassis-space-black-edge: #3A3A3D;
+  --af-chassis-space-black-base: #2D2D2F;
+  --af-chassis-space-gray:       #3A3A3C;
+  --af-chassis-space-gray-edge:  #505053;
+  --af-chassis-space-gray-base:  #2C2C2E;
+  --af-chassis-silver:           #D7D9DD;
+  --af-chassis-silver-edge:      #B3B6BC;
+  --af-chassis-silver-base:      #C0C3C8;
 }
 
 /* OKLCH variants (Tailwind v4 default) — use these on new builds.
